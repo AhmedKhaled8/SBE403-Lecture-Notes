@@ -1,11 +1,15 @@
 # Lecture 6 - Safe C Programming
 - [1. What is safe programming?](#1-what-is-safe-programming)
-- [2. Language Structure Traps](#2-language-structure-traps)
-  - [2.1. Presentation Traps](#21-presentation-traps)
-    - [2.1.1 Unjustified usage of macros.](#211-unjustified-usage-of-macros)
-    - [2.1.2 Using C Default Behaviors](#212-using-c-default-behaviors)
-    - [2.1.3 Avoid Any Coding Syntax That Would Cause Confusion](#213-avoid-any-coding-syntax-that-would-cause-confusion)
+- [2. Presentation Traps](#2-presentation-traps)
+  - [2.1. Unjustified usage of macros.](#21-unjustified-usage-of-macros)
+  - [2.2. Using C Default Behaviors](#22-using-c-default-behaviors)
+  - [2.3. Avoid Any Coding Syntax That Would Cause Confusion](#23-avoid-any-coding-syntax-that-would-cause-confusion)
+  - [2.2 Presentation Traps Prevention](#22-presentation-traps-prevention)
 - [3. Lexical Traps](#3-lexical-traps)
+  - [3.1. Confusion Between the Syntax of Similar Operators](#31-confusion-between-the-syntax-of-similar-operators)
+  - [3.2. Tokens](#32-tokens)
+  - [3.3 Constants Default Data Types](#33-constants-default-data-types)
+  - [3.4. Lexical Traps Prevention](#34-lexical-traps-prevention)
 
 ## 1. What is safe programming?
 C suffers from several issues:
@@ -36,8 +40,8 @@ This code will work fine because the `i` will always be less that 10 which is fi
 * i.e., when `i` is 144 (0x90), the value of `x` at index 144 (0x90) will be changed to 3. When `i` is 400 (0x190) when is casted to `unsigned char`, the value of `x` at index 400 (0x90) will be changed again to 3.
 * MISRA-C tells us that when indexing the array, it should be integer or casted to integer.
 
----
-## 2. Language Structure Traps
+--- 
+## 2. Presentation Traps
 
 Potential problems can be splitted into:
 * **Badly structured code:**
@@ -51,10 +55,10 @@ Potential problems can be splitted into:
   3. Syntactic traps.
   4. Semantic traps.
 
-### 2.1. Presentation Traps
+
 
 Examples for presentation traps are:
-#### 2.1.1 Unjustified usage of macros.
+### 2.1. Unjustified usage of macros.
 
 Example:
 ```c
@@ -127,7 +131,7 @@ int z = x + 1 * y;
 // z = 3 + 1 * 4 = 7
 ```
 
-#### 2.1.2 Using C Default Behaviors
+### 2.2. Using C Default Behaviors
 
 An example of a default behavior is the keyword `static` when used alone, it becomes by default `static int`.
 
@@ -144,7 +148,7 @@ static int x;
 static int v[] = {4, 7};
 ```
 
-#### 2.1.3 Avoid Any Coding Syntax That Would Cause Confusion
+### 2.3. Avoid Any Coding Syntax That Would Cause Confusion
 
 It's not preferable to use the comma operator to write multiple declarations or instructions in the same line, this would lead to misunderstanding of the actual intention of the instructions and the order of the execution.
 
@@ -184,6 +188,8 @@ if(interlock == ON)
 
 A quick fix is to use the curly braces and indentation to provide better presentation of the code.
 
+
+
 ```c
 interlock = OFF;
 if(stop == TRUE)
@@ -197,6 +203,8 @@ if(interlock == ON)
 }
 ```
 
+### 2.2 Presentation Traps Prevention
+
 **So to sum up,**
 * Avoid creating data types aliases using `#define`. Use `typedef` instead. 
 
@@ -204,7 +212,7 @@ if(interlock == ON)
 
 * Take care of the indenations, use code beautifier to help you.
 
-* Use clear, meaning_ful, and standardized names.
+* Use clear, meaningful, and standardized names.
 
 * Don't depend on implicit or default behaviors of the C language.
 
@@ -217,6 +225,7 @@ if(interlock == ON)
 
 ## 3. Lexical Traps
 
+### 3.1. Confusion Between the Syntax of Similar Operators
 problems of using instructions and operators that may be used in different situations. For example,
 
 * `=` and `==`
@@ -273,6 +282,16 @@ if(x || y)
 }
 ```
 
+Another example is the difference between assignment operators
+
+```c
+int x = 3;
+x += 1; // x = 4
+x =+ 1; // x = 1
+```
+
+### 3.2. Tokens
+
 When the compiler executes a complex instruction, it divides it into different segments each segment is called **[token](https://www.tutorialspoint.com/tokens-in-c)**.
 
 
@@ -303,3 +322,76 @@ y = x / z; // or y = x / (*p);
 * `x-->y` means what ?
 
 `x--` will decrement `x` first then will check if it is greater than `y`.
+
+
+
+### 3.3 Constants Default Data Types
+Another type of lexical traps is relying on C default types for constants
+
+* For floating-point real constants, their default data type is `double`.
+
+* For integer constants, their default data type is `signed int` or `int`.
+
+
+An example for such trap,
+
+```c
+float x = 0.7;
+
+if(x == 0.7)
+{
+    printf("True\n");
+}
+else
+{
+    printf("False\n");
+}
+```
+This code will result in `False`. Why?
+
+0.7, when stored as `float`, is stored with precision error (not exactly 0.7 but 0.699999999). The limitations of the [exponent and mantissa in IEEE standard](https://www.geeksforgeeks.org/ieee-standard-754-floating-point-numbers/) is different from `float` and `double` which is the default data type for the constant 0.7.
+
+A simple solution is to cast the constant 0.7 to `float` or assign `x` to be `double`.
+
+```c
+double x = 0.7;
+
+if(x == 0.7)
+{
+    printf("True\n");
+}
+else
+{
+    printf("False\n");
+}
+```
+
+or 
+
+```c
+float x = 0.7;
+
+if(x == (float)0.7)
+{
+    printf("True\n");
+}
+else
+{
+    printf("False\n");
+}
+```
+
+**But the first solution is better for its portablility.**
+
+### 3.4. Lexical Traps Prevention
+
+* Write your code clearly, use clear spaces between operators.
+
+* Limit the usage of assignment operators other than normal assignment (use `=` instead of `+=` or `-=`).
+
+* Avoid depending on the default data types for constants.
+
+* Avoid depending on C precedent (PEMDAS).
+
+* Take into consideration of the possible confusion between operators.
+
