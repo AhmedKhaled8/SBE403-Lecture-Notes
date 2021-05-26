@@ -211,7 +211,7 @@ if(interlock == ON)
 **So to sum up,**
 * Avoid creating data types aliases using `#define`. Use `typedef` instead. 
 
-* Avoid creating function-like macros. Like, `SET_BIT`, `CLEAR_BIT`, `TOGGLE_BIT`.
+* Avoid creating function-like macros. Like, `SET_BIT`, `CLEAR_BIT`, `TOGGLE_BIT`. Unless you justify using such kind of macros.
 
 * Take care of the indenations, use code beautifier to help you.
 
