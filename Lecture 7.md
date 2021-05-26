@@ -19,7 +19,16 @@
   - [2.5. Scopes](#25-scopes)
   - [2.6. Enums](#26-enums)
   - [2.7. Semantic Traps Prevention](#27-semantic-traps-prevention)
-  - [To Be Continued... هينزل النهاردة متقلقوش](#to-be-continued-هينزل-النهاردة-متقلقوش)
+- [3. Pre-Processors Traps](#3-pre-processors-traps)
+  - [3.1. Spaces](#31-spaces)
+  - [3.2. Parantheses](#32-parantheses)
+  - [3.3. Implying Multiple Argument Evaluation](#33-implying-multiple-argument-evaluation)
+  - [3.4. Creating New Aliases for Data Types](#34-creating-new-aliases-for-data-types)
+  - [3.5. Multi-Statement Function-Like Macros](#35-multi-statement-function-like-macros)
+  - [3.6. Constant Macros](#36-constant-macros)
+  - [3.7. Pre-Processors Traps Prevention](#37-pre-processors-traps-prevention)
+- [4. Conversions](#4-conversions)
+  - [4.1. Integer Promotion](#41-integer-promotion)
 
 
 ## 1. Syntactic Traps
@@ -455,4 +464,387 @@ enum colors = {RED = 1, GREEN = 2, BLUE = 2}
 * In nested scopes, don't name their variables with the same name.
 
 
-### To Be Continued... هينزل النهاردة متقلقوش
+## 3. Pre-Processors Traps
+
+**NOTE:** Some of the following function-like macros are likable to cause a presentation trap, justify the use of it if you are sure you will escape that trap.
+
+### 3.1. Spaces
+
+When creation a function-like macro,
+
+```c
+#define f (x) ((x) - 1)
+
+int main(void){
+    int y = f(5);
+}
+```
+
+After preprocessig, the code will be
+
+```c
+int main(void){
+    int y = (x)(5);
+}
+```
+
+which will result in compilation error. Why?
+
+**Answer:** because there is space between `#define f (x)` in which `f` will be replaced with `(x)`. To solve this problem,
+
+```c
+#define f(x) ((x) - 1) // take care of spaces
+
+int main(void){
+    int y = ((5) - 1);
+}
+```
+
+
+### 3.2. Parantheses
+
+In function-like macros, all macro arguments must be surrounded by parantheses to avoid any unusual behavoir regarding order of execution
+
+
+```c
+#define f(x, y) x * y
+
+int main(void)
+{
+    int x = 3;
+    int y = 4;
+    printf("%d", f(x + 1, y));
+}
+```
+
+The will result be `7`. Expected `16` ?
+
+**Answer:**
+Because the code after preprocessing will be
+
+```c
+int main(void)
+{
+    int x = 3;
+    int y = 4;
+    printf("%d", x + 1 * y);
+}
+```
+
+And becuase of PEMDAS (operations precendence), `1 * y` will be performed first and then added to `x` resulting in `7`. To solve this trap,
+
+```c
+#define f(x, y) (x) * (y)
+
+int main(void)
+{
+    int x = 3;
+    int y = 4;
+    printf("%d", f(x + 1, y));
+}
+```
+
+will be preprocessed into
+
+```c
+int main(void)
+{
+    int x = 3;
+    int y = 4;
+    printf("%d", (x+ 1) * (y));
+}
+```
+
+### 3.3. Implying Multiple Argument Evaluation
+
+
+```c
+#define cube(x) ((x) * (x) * (x))
+
+int getValue(void)
+{
+    static int i = 0;
+    i++;
+    return i;
+}
+
+int main(void)
+{
+    int y = 0;
+    y = cube(getValue());
+    printf("%d", y);
+}
+```
+
+Will `getValue()` be applied once then passed to `cube` macro or vice versa ?
+
+**Answer:** Preprcoessing will occur first so `getValue` will be called 3 times not just one. The code will be:
+
+```c
+int main(void)
+{
+    int y = 0;
+    y = (getValue()) * (getValue()) * (getValue());
+    printf("%d", y);
+}
+```
+
+So because of the `static` keyword in the function, `i` will be initialized once and will keep the last value for the next call so the ouptut will be `1 * 2 * 3` = `6`.
+
+
+### 3.4. Creating New Aliases for Data Types
+
+Macros shouldn't be used to create an alias.
+
+```c
+#define PTR_CHAR char *
+
+PTR_CHAR x, y;
+```
+
+What is the type of `x` and `y` ?
+
+* One would assume `x` and `y` both of the type `PTR_CHAR` which is `char *`.
+
+* However, the macro instructs the compiler to replace `PTR_CHAR` in the code with `char *`. When the text-replacement is done, this is the new code
+
+```c
+char * x, y;
+```
+
+As the asterisk, when used to declare a pointer, is bound to the variable `x` not the data type `char`. So, the above code can be written as
+
+```c
+char *x;
+char y;
+```
+
+Now, this is much familiar presentation that
+* **`x` is a  `char *`**
+* **`y` is a `char`**
+
+
+A solution to avoid such problem is using `typedef` instead of a `#define` to give an alternative presentation (alias) to a data type.
+
+```c
+typedef char * PTR_CHAR
+
+PTR_CHAR x, y;
+```
+
+can be written as
+
+```c
+char *x;
+char *y;
+```
+
+**Now, `x` and `y` are `char *`.**
+
+
+### 3.5. Multi-Statement Function-Like Macros
+
+Macro functions that generate several statments that are not returning a value must be encapsulated with ```do{} while(0)` where every line is followed with a backslack `\` before going to the next line.
+
+
+```c
+#define CHG_VALUE(VALUE, MASK, VAR) VAR &= ~MASK; VAR |= (MASK & VALUE);
+
+
+int main(void)
+{
+    unsigned char x = 0xa0;
+    CHG_VALUE(3, 0x03, x);
+    printf("%d", x);
+}
+```
+
+
+will be processed into
+
+```c
+int main(void)
+{
+    unsigned char x = 0xa0;
+    x &= ~0x03; x |= (0x03 & 3);;
+    printf("%x", x);
+}
+```
+
+
+Same if we wrote the macro,
+
+```c
+#define CHG_VALUE(VALUE, MASK, VAR) do\
+                                    {\
+                                        VAR &= ~MASK;\
+                                        VAR |= (MASK & VALUE);\
+                                    } while(0);
+```
+
+Much better in readability.
+
+
+**Question:** Why don't we just use `inline` keyword for function replacement ?
+
+**Answer:** Because `inline` doesn't have the same configurations for all compilers if it was compatiable for that compiler in the first place.
+
+
+### 3.6. Constant Macros
+
+Macros defining constants must surround the constants with parantheses.
+
+```c
+#define MAX 10 + 2
+
+int main(void)
+{
+    printf("%d", MAX * 2);
+}
+```
+
+The output will be `24`, right ?
+
+**Answer:** Wrong, the replacement will make the code look like this,
+
+```c
+int main(void)
+{
+    printf("%d", 10 + 2 * 2);
+}
+```
+
+So `2 * 2` will be executed first then will be added to `10` to be `14`.
+
+Using parantheses,
+
+```c
+#define MAX (10 + 2)
+
+int main(void)
+{
+    printf("%d", MAX * 2);
+}
+```
+
+Preprpcessed code will be,
+
+```c
+int main(void)
+{
+    printf("%d", (10 + 2) * 2);
+}
+```
+
+### 3.7. Pre-Processors Traps Prevention
+
+
+* All macros arguments, constants must be surrounded by parantheses.
+
+* Avoid using macros for alias type definition, use `typedef` instead.
+
+* Take care of possible evaluation of function or operator (prefix increment).
+
+
+## 4. Conversions
+
+When operations deal with different data types, conversion occur to make the data types the same.
+
+
+
+* Operations for equal types don't need conversion.
+
+```c
+// perfect case:
+
+unsigned char x, y, z;
+z = (unsigned char) 5;
+y = (unsigned char) 6;
+x = z + y; // all uchar (perfect case)
+```
+
+* If types are different, the samaller type is converted to the larger type
+
+```c
+unsigned char x, z;
+int y;
+z = (unsigned char) 5;
+y  10;
+x = z + y; // z will be converted to int
+```
+
+For example,
+
+* `long double` operations with smaller types require converting the samller types to `long double`.
+
+```c
+long double x;
+float y;
+long double z;
+x = 0.92;
+y = 0.2;
+z = x + y; // x will be converted to long double.
+```
+
+### 4.1. Integer Promotion
+
+
+When arithmetic operations are done on integers (`char` is 1-byte `int`), including the uniary operators [+ ~ -]- integer promotion must be applied first.
+
+It's promoted to a `signed int` or `int` if it can store the value (up to 31 bits), if it can't, the integer is promoted to `unsigned int` (up to 32 bits).
+
+```c
+int main(void)
+{
+    char a = 30, b = 40, c = 10;
+    char d = (a * b) / c;
+    printf("%d", d);
+    return 0;
+}
+```
+
+The result will be `120`.
+
+```c
+int main(void)
+{
+    char a = 0xfb; // char can only store 7 bits
+    unsigned char b = 0xfb; // uchar can store 8 bits.
+    printf("a = %x", a);
+    printf("\nb = %x", b);
+    if(a == b)
+    {
+        printf("\nSame");
+    }
+    else
+    {
+        printf("\nNot Same");
+    }
+    return 0;
+}
+```
+
+The result will be
+
+```
+a = fffffffb
+b = fb
+Not Same
+```
+
+**Because:**, when storing `0xfb` in a. It is promoted to a `signed int`. And to keep the sign bit *MSB*, it is padded by one, so it was printed to `fffffffb`.
+
+When comparing `a` to `b`, `b` which was `unsigned char` was converted to `signed int`. But `b` was unsigned so it was positive. So when `b` is stored, it is stored as `000000fb`. That's why `Not Same` was printed.
+
+
+**NOTES:** 
+* Conversion (Promotion) will not occur if the types and signs of the operands in a operation are the same.
+
+* If types are different but the sign is the same, convert smaller to bigger type.
+
+* If signs are different but types are the same, convert the unsigned to the suitable signed type. If larger type is needed, convert both types to that larger type (`int`)
+
+* If signs are different and types are different:
+
+  * If the larger type is signed, convert the smaller unsigned to the larger signed.
+  * If the larger type is unsigned, convert the smaller signed to the larger unsigned.   
