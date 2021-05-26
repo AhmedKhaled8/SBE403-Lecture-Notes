@@ -40,7 +40,7 @@ This code will work fine because the `i` will always be less that 10 which is fi
 
 * Not really, what if we wanted to change the `MAX_SIZE` in the macro to 500 instead of 10. `define ARR_SIZE 500`
 * Now when indexing the array when `i` is more than 255 will result in a logic error and only the indexes of 0-255 will be changed, some of these indexes will be changed more than once.
-* i.e., when `i` is 144 (0x90), the value of `x` at index 144 (0x90) will be changed to 3. When `i` is 400 (0x190) when is casted to `unsigned char`, the value of `x` at index 400 (0x90) will be changed again to 3.
+* i.e., when `i` is 144 (0x90), the value of `x` at index 144 (0x90) will be changed to 3. When `i` is 400 (0x190) when is casted to `unsigned char`, the value of `x` at index 140 (0x90) will be changed again to 3.
 * MISRA-C tells us that when indexing the array, it should be integer or casted to integer.
 
 --- 
