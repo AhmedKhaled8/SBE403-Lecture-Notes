@@ -561,10 +561,10 @@ A strucute has an addrees, thus, can be referenced by a pointer.
 Employee emp;
 Employee *p;
 p = &emp;
-emp->firstName = "Ahmed";
+p->firstName = "Ahmed";
 
 // Same as
-(*emp).firstName = "Ahmed";
+(*p).firstName = "Ahmed";
 ```
 
 ### 13. Bitfields
