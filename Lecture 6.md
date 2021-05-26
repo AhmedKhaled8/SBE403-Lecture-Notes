@@ -20,6 +20,9 @@ C suffers from several issues:
 3. **Risky parts** that may be illogical but the compiler won't tell you that. **Example**: Acessing the 20th element of an array that was declared with a size of 10.
 
 Coding C in a safe manner will make our code limited in a subset of the language which is called a **Coding Standard**. One of the most famous standards is **MISRA-C** which is used frequently in the automative field.
+
+**NOTE:** This is a useful link to look for some MISRA-C rules with examples. [link](https://gitlab.com/MISRA/MISRA-C/MISRA-C-2004/Exemplar-Suite). **Thanks to Eslam**
+
 Example:
 
 ```c
