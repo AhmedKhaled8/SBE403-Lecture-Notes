@@ -140,7 +140,7 @@ An example of a default behavior is the keyword `static` when used alone, it bec
 
 ```c
 static i, x, v[] = {4, 7};
-// So, i  is int, x is int, v is int
+// So, i  is int, x is int, v is int[]
 ```
 
 should be written,
