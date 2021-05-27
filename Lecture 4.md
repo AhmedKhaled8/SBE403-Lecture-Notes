@@ -551,7 +551,8 @@ The members of the struct can be accessed using the period `.` then the member n
 
 ```
 Employee emp;
-emp.firstName = "Ahmed";
+//emp.firstName = "Ahmed"; // Not applicable in instead we do...
+strcpy(emp.firstName, "Ahmed");
 emp.age = 20;
 ```
 
@@ -561,10 +562,9 @@ A strucute has an addrees, thus, can be referenced by a pointer.
 Employee emp;
 Employee *p;
 p = &emp;
-p->firstName = "Ahmed";
-
+strcpy(p->firstName, "Ahmed");
 // Same as
-(*p).firstName = "Ahmed";
+strcpy((*p).firstName, "Ahmed");
 ```
 
 ### 13. Bitfields
