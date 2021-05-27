@@ -30,7 +30,7 @@ error: 'x' undeclared (first use in this function)
                   ^
 ```
 
-1.2. Function Prototype
+1.2. Function Scope
 
 A variable defined as a parameter for a function definition can't be accessed automatically outside the function even in the function decleration.
 
