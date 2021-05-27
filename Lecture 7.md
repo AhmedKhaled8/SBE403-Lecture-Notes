@@ -783,7 +783,7 @@ float y;
 long double z;
 x = 0.92;
 y = 0.2;
-z = x + y; // x will be converted to long double.
+z = x + y; // y will be converted to long double.
 ```
 
 ### 4.1. Integer Promotion
