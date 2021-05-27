@@ -342,7 +342,7 @@ We can access through the pointer to pointer by double dereferncing
 ```c
 unsigned char x[3];
 unsigned char *p1;
-unsigned char *p2;
+unsigned char **p2;
 p1 = &x[0];
 p2 = &p1;
 
