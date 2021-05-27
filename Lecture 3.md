@@ -200,7 +200,7 @@ That also includes using `static` keyword when declaring a variable that will be
 
 ---
 
-Variables of different scopes can be named the same. When accessing the variable, we go from inner scope and outwards.
+Variables of different scopes can be named the same. When accessing the variable, we go from current scope then go outwards.
 
 For example,
 
