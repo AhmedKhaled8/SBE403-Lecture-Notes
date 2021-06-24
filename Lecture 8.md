@@ -1,10 +1,24 @@
 # Lecture 8 - Layered Architecture
 
+- [1. Design Patterns](#1-design-patterns)
+- [2. Layered Architecutre](#2-layered-architecutre)
+- [3. Micro Controller Abstract Layer (MCAL)](#3-micro-controller-abstract-layer-mcal)
+- [4. Hardware Abstract Layer (HAL)](#4-hardware-abstract-layer-hal)
+- [5. Application Layer](#5-application-layer)
+- [6. Types of Layered Architecture](#6-types-of-layered-architecture)
+  - [6.1. Closed-Layer Approach](#61-closed-layer-approach)
+  - [6.2. Open-Layer Approach](#62-open-layer-approach)
+- [7. Sinkhole Anti-Pattern](#7-sinkhole-anti-pattern)
+- [8. Layered Architecture Pattern Analysis](#8-layered-architecture-pattern-analysis)
+  - [8.1. Overall Agility (Flexibility) <span style="color:red">LOW</span>](#81-overall-agility-flexibility-low)
+  - [8.2. Testability <span style="color:green">HIGH</span>](#82-testability-high)
+  - [8.3. Perfomrance <span style="color:red">LOW</span>](#83-perfomrance-low)
+  - [8.4.Ease of Development <span style="color:green">HIGH</span>](#84ease-of-development-high)
+
 ### 1. Design Patterns
 
 A design pattern is a standard way of solving a specific common type of problems. One pattern is the layered architecture or the n-tier(layer) architecture.
 
-<!--> <span style="color:blue"> <-->
 
 ### 2. Layered Architecutre
 
