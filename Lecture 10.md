@@ -45,24 +45,24 @@
 
 ### 3. SPI Example
 
-SPI is a high-rate synchronus protocol. Let's say it takes $1 \mu s$ for each byte to be transferred. We want to design a polling pattern to extract the data transfered from the SPI protocol.
+SPI is a high-rate synchronus protocol. Let's say it takes 1 microsecond for each byte to be transferred. We want to design a polling pattern to extract the data transfered from the SPI protocol.
 
 #### 3.1. Periodic Polling Approach
 
-* Desiging the pattern as a periodic polling means that we will select a timer and set it's ISR trigger peroid for $1 \mu s$ and when the ISR is triggered, we call the poller.
+* Desiging the pattern as a periodic polling means that we will select a timer and set it's ISR trigger peroid for 1 microsecond and when the ISR is triggered, we call the poller.
 
-* This is unreasonable approach as $1 \mu s$ is very small peroid that would cause a great load on the CPU to call the poller every period.
+* This is unreasonable approach as 1 microsecond is very small peroid that would cause a great load on the CPU to call the poller every period.
 
 
 #### 3.2. Opportunistic Polling Approach
 
-* A better approach is to the design the pattern as opportunistic polling by checking the value of the SPI transfer finished flag for each byte. Again, we need to set a period to check the flag and to take the worst case scenario we will set the period to $1 \mu s$.
+* A better approach is to the design the pattern as opportunistic polling by checking the value of the SPI transfer finished flag for each byte. Again, we need to set a period to check the flag and to take the worst case scenario we will set the period to 1 microsecond.
 
-* Such a small period will still cause a huge CPU load. In such cases when working with a high-rate SPI, a FIFO (First-In-First-Out) external memory is coupled with the SPI, so that when collection a set number of bytes (say 100 bytes), a ISR (flag) will be triggered and we can check this flag instead of the SPI flag as now the worst case scenario will be 10 ms instead of 1 $\mu$ s.
+* Such a small period will still cause a huge CPU load. In such cases when working with a high-rate SPI, a FIFO (First-In-First-Out) external memory is coupled with the SPI, so that when collection a set number of bytes (say 100 bytes), a ISR (flag) will be triggered and we can check this flag instead of the SPI flag as now the worst case scenario will be 100 microseconds instead of 1 microsecond.
 
 #### 3.3. Modified Periodic Polling Approach
 
-* Now, after adding the FIFO memory, we can set the periodicity of calling the poller function to be 10 ms instead of 1 $\mu$ s.
+* Now, after adding the FIFO memory, we can set the periodicity of calling the poller function to be 100 microseconds instead of 1 microsecond.
 
 
 ### 4. Opportunistic Polling Structure
