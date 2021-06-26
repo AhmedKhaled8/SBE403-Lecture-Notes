@@ -307,8 +307,8 @@ else
 }
 ```
 
-Here because `unsigned short` has a range of [0, 65535] (2 bytes), if for example `address` was 35535 and `offset` was 30000.
-Then, the summation of `address` and `offset` is greater than 512, but also greater than 65535 which is the max range of `unsigned short` which will cause a modulo and returns a 1 which is less than 512.
+Here because `unsigned short` has a range of [0, 65535] (2 bytes), if for example `address` was 35537 and `offset` was 30000.
+Then, the summation of `address` and `offset`, which equals 65537, is greater than 512, but also greater than 65535 which is the max range of `unsigned short` which will cause a modulo and returns a 1 (65535 will return 65535, 65536 will return 0, 65537 will return 1) which is less than 512.
 
 So, you need to make sure that is `address + offset` can for any reason exceed the range, if so, you need to store it in a new variable that is capable of storing such extrema. Or, change the data type of `address` and `offset`.
 
