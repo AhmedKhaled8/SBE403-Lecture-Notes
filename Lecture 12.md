@@ -151,4 +151,4 @@ We can get the average CPU load using the following equation,
 in our example, the average period is 20 ms, then we can get the average CPU load as 
 
 
-<img src="doc/img/avg_cpu_exampe.png" width="2500" height="600">
+<img src="doc/img/avg_cpu_example.png" width="2500" height="600">
